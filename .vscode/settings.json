@@ -6,6 +6,8 @@
         "list": "c",
         "vector": "c",
         "string_view": "c",
-        "span": "c"
+        "span": "c",
+        "string": "c",
+        "ranges": "c"
     }
 }

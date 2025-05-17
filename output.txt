@@ -1,0 +1,2 @@
+Input 1 for random process creation, 2 for manual process creation, 3 for test
+Choice: 
