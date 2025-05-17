@@ -600,6 +600,15 @@ void preemptive_priority(int *chart, int *ta, int *wa) {
     display_Gantt(chart);
     display_eval(ta, wa);
 }
+void lottery(int *chart, int *ta, int *wa) {
+
+}
+void sjf_aging(int *chart, int *ta, int *wa) {
+    
+}
+void mlfq(int *chart, int *ta, int *wa) {
+    
+}
 int main()
 {
     srand(time(NULL));
