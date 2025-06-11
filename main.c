@@ -9,9 +9,9 @@
 #define MAX_PROCESS 30
 #define MAX_DEVICE 3
 #define MAX_EVENT 150
-#define MLFQ_N 3
+#define MLFQ_N 10
 #define MAX_WAIT 10
-#define context_switch 0
+#define context_switch 1
 #define min(a,b) a<b?a:b
 
 typedef struct {
@@ -256,12 +256,14 @@ void display_Gantt(int *chart, int over) {
     for (int i=1;i<=MAX_PROCESS;i++) cnt[i] = 0;
     for (int i=0;i<=over;i++) {
         printf("%d ",chart[i]);
+        /*
         if (chart[i] && chart[i] != chart[i+1]) {
             if (cnt[chart[i]] < io_n_list[chart[i]]) {
                 printf("/ ");
             }
             cnt[chart[i]]++;
         }
+        */
     }
     puts("");
 }
@@ -270,7 +272,7 @@ void display_eval(int *chart, int *ta, int *wa, int over) {
     int rsp[MAX_PROCESS + 1];
     int run = 0, start = TIME_MAX;
     for (int i=1;i<=n;i++) {
-        start = min(start, arr[i].s);
+        start = min(start, arr2[i].s);
     }
     for (int i=over;i>=start;i--) {
         rsp[chart[i]] = i;
@@ -278,13 +280,13 @@ void display_eval(int *chart, int *ta, int *wa, int over) {
     }
 
     for (int i=1;i<=n;i++) {
-        printf("Process %d; waiting time: %d, turnaround time: %d, response time: %d\n",i,wa[i],ta[i],rsp[i]);
+        printf("Process %d; waiting time: %d, turnaround time: %d, response time: %d\n",i,wa[i],ta[i],rsp[i]-arr2[i].s);
         sw += wa[i];
         st += ta[i];
         srsp += rsp[i];
     }
     assert(over >= start);
-    printf("Average waiting time: %lf\nAverage turnaround time: %lf\nAverage response time: %lf\nCPU utilization: %lf\nIdle time: %d\n",(double)sw/n, (double)st/n,(double)srsp/n,(double)run/(over-start+1)*100.0,over-start+1-run);
+    printf("Average waiting time: %.1lf\nAverage turnaround time: %.1lf\nAverage response time: %.1lf\nCPU utilization: %.1lf\nIdle time: %d\n",(double)sw/n, (double)st/n,(double)srsp/n,(double)run/(over-start+1)*100.0,over-start+1-run);
 }
 void fcfs(int *chart, int *ta, int *wa) {
     Queue* rq = initqueue();
@@ -1067,21 +1069,21 @@ void mlfq_aging(int *chart, int *ta, int *wa, int tq) {
 }
 int main()
 {
-    // freopen("aging.txt", "r", stdin);
+    freopen("aging.txt", "r", stdin);
     srand(time(NULL));
     int choice, tq = 2;
     printf("Input 1 for random process creation, 2 for manual process creation, 3 for test\n");
     printf("Choice: ");
     scanf("%d",&choice);
     if (choice == 1) {
-        n = 1 + (rand() % MAX_PROCESS);
+        n = 25;
         io_n = rand() % MAX_EVENT;
-        io_n = 5;
+        io_n = 5*n;
         printf("number of process: %d\nnumber of events: %d\n",n,io_n);
         for (int i=1;i<=n;i++) {
             int b = 1 + (rand() % 20); // burst
             int a = 1 + (rand() % 20); // arrival
-            int p = 1 + (rand() % 20);
+            int p = 21 - b;
             arr[i] = (Process){i, b, a, -1, 0, b, 0, p, 0, 0};
             printf("Process %d : %d (arrival), %d (burst), %d (priority)\n",arr[i].pid,arr[i].s,arr[i].burst,arr[i].p);
         }
@@ -1133,18 +1135,22 @@ int main()
     puts("SJF Scheduler");
     sjf(sjf_chart, sjf_ta, sjf_wa);
     puts("");
+    /*
     puts("Priority Scheduler");
     priority(priority_chart, priority_ta, priority_wa);
     puts("");
+    */
     puts("RR Scheduler (default time quantum is 2)");
     rr(rr_chart, rr_ta, rr_wa, tq);
     puts("");
     puts("Preemptive SJF Scheduler");
     preemptive_sjf(preemptive_sjf_chart, preemptive_sjf_ta, preemptive_sjf_wa);
     puts("");
+    /*
     puts("Preemptive Priority Scheduler");
     preemptive_priority(preemptive_priority_chart, preemptive_priority_ta, preemptive_priority_wa);
     puts("");
+    */
     puts("Highest Response Ratio Next Scheduler");
     hrn(hrn_chart, hrn_ta, hrn_wa);
     puts("");
